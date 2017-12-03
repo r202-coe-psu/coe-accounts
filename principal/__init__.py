@@ -8,6 +8,7 @@ from flask import Flask
 from . import views
 from . import acl
 from . import models
+from . import oauth
 
 def create_app():
     app = Flask(__name__)
@@ -15,9 +16,11 @@ def create_app():
     app.config.from_envvar('PRINCIPAL_SETTINGS', silent=True)
 
     models.init_db(app)
-    views.register_blueprint(app)
     acl.init_acl(app)
+    oauth.init_oauth(app)
     
+    views.register_blueprint(app)
+
     return app
 
 

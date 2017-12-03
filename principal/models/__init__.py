@@ -1,4 +1,5 @@
 from .users import User, DataSource
+from .oauth import OAuthClient, OAuthGrant, OAuthToken
 
 
 from flask_mongoengine import MongoEngine

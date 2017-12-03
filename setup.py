@@ -13,6 +13,7 @@ requires = [
     'flask-mongoengine',
     'flask-login',
     'flask-allows',
+    'flask-oauthlib',
     'authomatic',
     'ldap3',
     'passlib',

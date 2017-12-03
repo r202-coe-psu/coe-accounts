@@ -1,6 +1,6 @@
 {% extends "/base/base-layout.html" %}
 
-{% block title %}Home Hero Dashboard{% endblock %}
+{% block title %}{{ config.get('APP_TITLE') }} Dashboard{% endblock %}
 
 {% block jsmodule %}
 System.import('css-framework').then(() => {
