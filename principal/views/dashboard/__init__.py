@@ -1,19 +1,19 @@
 from flask import Blueprint, render_template, g
 from flask_login import login_required
 
+from . import admin
 
-url_prefix = '/dashboard'
-module = Blueprint('dashboard', __name__, url_prefix=url_prefix)
+module = Blueprint('dashboard', __name__, url_prefix='/dashboard')
+subviews = [admin]
 
+def get_blueprints():
+    from principal.views import get_subblueprints
 
-def register_blueprint(app):
-    app.register_blueprint(module)
+    views = [admin]
+    blueprints = get_subblueprints(views,
+                                   module.url_prefix)
 
-    for view in []:
-        app.register_blueprint(
-            view.module,
-            url_prefix=url_prefix + view.module.url_prefix)
-
+    return blueprints
 
 
 @module.route('/')
