@@ -3,6 +3,7 @@ from . import site
 from . import accounts
 
 from . import dashboard
+from . import api
 
 
 def get_subblueprints(views=[]):
@@ -20,7 +21,10 @@ def get_subblueprints(views=[]):
 
 
 def register_blueprint(app):
-    blueprints = get_subblueprints([site, accounts, dashboard])
+    blueprints = get_subblueprints([site,
+                                    accounts,
+                                    dashboard,
+                                    api])
     
     for blueprint in blueprints:
         app.register_blueprint(blueprint)

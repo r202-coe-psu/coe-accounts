@@ -14,16 +14,33 @@
         </div>
     </li>
     <li><a href="{{ url_for('dashboard.index') }}"><i class="material-icons">dashboard</i>Dashboard</a></li>
+    {% if current_user.has_roles(['admin']) %}
     <li>
       <ul class="collapsible" data-collapsible="accordion" style="padding-left:16px;">
-        <li><a class="collapsible-header waves-effect waves-cyan"><i class="material-icons">home</i>xxx <i class="material-icons right" id="more">expand_more</i></a>
+        <li><a class="collapsible-header waves-effect waves-cyan"><i class="material-icons">supervisor_account</i>Admin <i class="material-icons right" id="more">expand_more</i></a>
           <div class="collapsible-body">
             <ul>
+              <li><a style="padding-left:32px;" href="{{ url_for('dashboard.index') }}"><i class="material-icons">dashboard</i>Dashboard</a></li>
             </ul>
           </div>
         </li>
       </ul>
     </li>
+    {% endif %}
+    {% if current_user.has_roles(['developer', 'admin']) %}
+    <li>
+      <ul class="collapsible" data-collapsible="accordion" style="padding-left:16px;">
+        <li><a class="collapsible-header waves-effect waves-cyan"><i class="material-icons">code</i>Developer <i class="material-icons right" id="more">expand_more</i></a>
+          <div class="collapsible-body">
+            <ul>
+              <li><a style="padding-left:32px;" href="{{ url_for('dashboard.developers.oauth.index') }}"><i class="material-icons">perm_identity</i>OAuth2</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </li>
+    {% endif %}
+
     <li><a href="{{ url_for('accounts.logout') }}"><i class="material-icons">exit_to_app</i>Logout</a></li>
 </ul>
                     
@@ -35,7 +52,7 @@
             <div class="nav-wrapper">    
                 <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
                 <span style="padding-left:10px;">
-                    <a href="{{ url_for('dashboard.index') }}" class="brand-logo"><i class="material-icons">dashboard</i>{{ config.get('APP_TITLE') }} Dashboard</a>
+                  <a href="{{ url_for('dashboard.index') }}" class="brand-logo"><i class="material-icons">dashboard</i>{% block dashboard_title %}{{ config.get('APP_TITLE') }} Dashboard{% endblock %}</a>
                 </span>
                 <ul class="right hide-on-med-and-down">
                     <li><a href="sass.html"><i class="material-icons">search</i></a></li>

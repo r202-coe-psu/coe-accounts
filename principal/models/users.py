@@ -48,3 +48,8 @@ class User(me.Document, UserMixin):
         return bcrypt.verify(password,
                              self.password)
 
+    def has_roles(self, roles):
+        for role in roles:
+            if role in self.roles:
+                return True
+        return False

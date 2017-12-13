@@ -33,8 +33,9 @@
       </div>
     </div>
     {% endif %}
-    <form method="POST" action="{{ request.path }}">
+    <form method="POST" action="{{ request.url }}">
       {{ form.csrf_token }}
+      {{ form.came_from }}
       <div class="row"> 
         <div class="input-field col s12">
           {{ form.name(class_=get_validate_class(form.name.errors)) }}

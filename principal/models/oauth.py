@@ -2,8 +2,11 @@
 # https://flask-oauthlib.readthedocs.io/en/latest/oauth2.html
 # modify for mongoengine
 
-from .users import User
 import mongoengine as me
+import uuid
+import datetime
+
+from .users import User
 
 class OAuthClient(me.Document):
     # human readable name, not required
@@ -16,15 +19,29 @@ class OAuthClient(me.Document):
     user = me.ReferenceField(User, dbref=True)
     # required if you need to support client credential
 
-    secret = me.StringField(required=True, unique=True, index=True)
+    # secret = me.StringField(required=True, unique=True, index=True)
+    secret = me.UUIDField(required=True,
+                          uniqued=True,
+                          binary=False,
+                          default=uuid.uuid4)
 
     # public or confidential
-    is_confidential = me.BooleanField()
+    confidential = me.BooleanField(default=False)
 
     redirect_uris = me.ListField(me.URLField())
     default_scopes = me.ListField(me.StringField())
 
+    created_date = me.DateTimeField(required=True,
+                                    default=datetime.datetime.utcnow)
+    updated_date = me.DateTimeField(required=True,
+                                    default=datetime.datetime.utcnow,
+                                    auto_now=True)
+
     meta = {'collection': 'oauth_clients'}
+
+    @property
+    def client_id(self):
+        return self.id
 
     @property
     def client_type(self):
@@ -50,6 +67,10 @@ class OAuthGrant(me.Document):
 
     meta = {'collection': 'oauth_grants'}
 
+    @property
+    def client_id(self):
+        return self.client.id
+
 
 class OAuthToken(me.Document):
     client = me.ReferenceField(OAuthClient, dbref=True)
@@ -64,3 +85,5 @@ class OAuthToken(me.Document):
     scopes = me.ListField(me.StringField())
 
     meta = {'collection': 'oauth_tokens'}
+
+

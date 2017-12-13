@@ -76,7 +76,7 @@ def validate_old_password(form, field):
 class LoginForm(FlaskForm): 
     name = fields.TextField('Username or Email', validators=[validators.InputRequired()])
     password = fields.PasswordField('Password', validators=[validators.InputRequired()])
-    came_from = fields.HiddenField('Came form')
+    came_from = fields.HiddenField('Came Form')
     
 class RegisterForm(FlaskForm):
     username = fields.TextField('Username',

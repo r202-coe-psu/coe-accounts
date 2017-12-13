@@ -1,0 +1,54 @@
+{% extends '/dashboard/developers/oauth/index.html' %}
+{% block content %}
+<div class="row">
+  <div class="col s12">
+    <h5>Create Project</h5>
+  </div>
+</div>
+
+<div class="row">
+  <form class="col s12" action="{{ request.path }}"  method="POST">
+    {{ form.csrf_token }}
+    {% if form.errors %}
+    {{ form.errors }}
+    {% endif %}
+    <div class="row">
+      <div class="input-field col s12">
+        {{ form.name(class_="validate") }}
+        {{ form.name.label }}
+      </div>
+    </div>
+     <div class="row">
+      <div class="input-field col s12">
+        {{ form.description(class_="validate") }}
+        {{ form.description.label }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col s8">
+        <div class="switch">
+          <label>
+            Confidential
+            {{ form.confidential }}
+            <span class="lever"></span>
+            Public
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        {{ form.redirect_uris }}
+        {{ form.redirect_uris.label }}
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="input-field col s12">
+        <button type="submit" class="waves-effect waves-light btn">Create</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

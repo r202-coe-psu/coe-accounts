@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Authorization</title>
+</head>
+<body>
+  <p>Client: {{ client.client_id }}</p>
+  <p>User: {{ current_user.username }}</p>
+  <form action="{{ request.uri }}" method="post">
+    <p>Allow access?</p>
+    <input type="submit" name="confirm" value="yes">
+    <input type="submit" name="confirm" value="no">
+  </form>
+</body>
+</html>

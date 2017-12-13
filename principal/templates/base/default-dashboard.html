@@ -27,7 +27,7 @@ System.import('css-framework').then(() => {
 {% endblock additional_head %}
 
 {% block header %}
-  {% include "/base/toolbar-dashboard.html" %}
+  {% include "/base/toolbar-dashboard.html" with context %}
 {% endblock %}
 
 {% block main %}
