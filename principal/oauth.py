@@ -5,16 +5,16 @@ from flask_oauthlib.contrib.oauth2 import bind_cache_grant
 from flask_login import current_user, login_required
 from . import models
 
-oauth = OAuth2Provider()
-module = Blueprint('oauth', __name__, url_prefix='/oauth')
+oauth2 = OAuth2Provider()
+module = Blueprint('oauth2', __name__, url_prefix='/oauth2')
 
 def init_oauth(app):
-    oauth.init_app(app)
+    oauth2.init_app(app)
     app.register_blueprint(module)
 
 @module.route('/authorize', methods=['GET', 'POST', 'HEAD'])
 @login_required
-@oauth.authorize_handler
+@oauth2.authorize_handler
 def authorize(*args, **kwargs):
     if request.method == 'GET':
         client_id = kwargs.get('client_id')
@@ -30,7 +30,7 @@ def authorize(*args, **kwargs):
     confirm = request.form.get('confirm', 'no')
     return confirm == 'yes'
 
-@oauth.usergetter
+@oauth2.usergetter
 def get_user(username, password, *args, **kwargs):
     user = models.User.objects(username=username).first()
     if user.check_password(password):
@@ -38,19 +38,19 @@ def get_user(username, password, *args, **kwargs):
     return None
 
 
-@oauth.clientgetter
+@oauth2.clientgetter
 def load_client(client_id):
     return models.OAuthClient.objects.get(id=client_id)
 
 
-@oauth.grantgetter
+@oauth2.grantgetter
 def load_grant(client_id, code):
     client = models.OAuthClient.objects.get(id=client_id)
     grant = models.OAuthGrant.objects(client=client, code=code).first()
     return grant
 
 
-@oauth.grantsetter
+@oauth2.grantsetter
 def save_grant(client_id, code, request, *args, **kwargs):
     # decide the expires time yourself
     expires = datetime.utcnow() + timedelta(seconds=100)
@@ -68,7 +68,7 @@ def save_grant(client_id, code, request, *args, **kwargs):
     return grant
 
 
-@oauth.tokengetter
+@oauth2.tokengetter
 def load_token(access_token=None, refresh_token=None):
     if access_token:
         return models.OAuthToken.objects(access_token=access_token).first()
@@ -76,7 +76,7 @@ def load_token(access_token=None, refresh_token=None):
         return models.OAuthToken.objects(refresh_token=refresh_token).first()
     return None
 
-@oauth.tokensetter
+@oauth2.tokensetter
 def save_token(token, request, *args, **kwargs):
     user = models.User.objects.get(id=request.user.id)
     client = models.OAuthClient.objects(id=request.client.client_id,
@@ -103,13 +103,13 @@ def save_token(token, request, *args, **kwargs):
     return new_token
 
 @module.route('/token', methods=['GET', 'POST'])
-@oauth.token_handler
+@oauth2.token_handler
 def access_token():
     return {}
     # return {'version': '0.1.0', }
 
 @module.route('/revoke', methods=['POST'])
-@oauth.revoke_handler
+@oauth2.revoke_handler
 def revoke_token():
     pass
 
