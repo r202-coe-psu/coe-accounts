@@ -1,16 +1,20 @@
 from datetime import datetime, timedelta
+
 from flask import Blueprint, request, render_template, session
 from flask_oauthlib.provider import OAuth2Provider
-from flask_oauthlib.contrib.oauth2 import bind_cache_grant
 from flask_login import current_user, login_required
+
 from . import models
+
 
 oauth2 = OAuth2Provider()
 module = Blueprint('oauth2', __name__, url_prefix='/oauth2')
 
+
 def init_oauth(app):
     oauth2.init_app(app)
     app.register_blueprint(module)
+
 
 @module.route('/authorize', methods=['GET', 'POST', 'HEAD'])
 @login_required

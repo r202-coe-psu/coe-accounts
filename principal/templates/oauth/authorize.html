@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Authorization</title>
-</head>
-<body>
+{% extends "/base/default-page.html" %}
+
+{% block title %}{{ config.get('APP_TITLE') }} Authorization{% endblock %}
+
+{% block content %}
   <p>Client: {{ client.client_id }}</p>
   <p>User: {{ current_user.username }}</p>
   <form action="{{ request.uri }}" method="post">
@@ -12,5 +10,5 @@
     <input type="submit" name="confirm" value="yes">
     <input type="submit" name="confirm" value="no">
   </form>
-</body>
-</html>
+
+{% endblock content %}

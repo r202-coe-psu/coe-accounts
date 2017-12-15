@@ -1,0 +1,3 @@
+#!/bin/bash
+
+PRINCIPAL_SETTINGS=$(pwd)/principal.cfg principal-web -d

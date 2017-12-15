@@ -29,7 +29,7 @@ class OAuthClient(me.Document):
     confidential = me.BooleanField(default=False)
 
     redirect_uris = me.ListField(me.URLField())
-    default_scopes = me.ListField(me.StringField())
+    default_scopes = me.ListField(me.StringField(), default=['email', 'me'])
 
     created_date = me.DateTimeField(required=True,
                                     default=datetime.datetime.utcnow)
