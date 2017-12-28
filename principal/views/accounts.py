@@ -45,19 +45,14 @@ def authenticate(name, password):
             data = ldap_client.get_info()
             user = add_new_user_with_ldap(data)
 
-        login_user(user)
-        return True
+        return user
     elif user and user.verify_password(password):
-        login_user(user)
-        return True
+        return user
 
-    return False
+    return None
 
 
-@module.route('/login', methods=('GET', 'POST'))
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+def check_login_form():
 
     form = forms.accounts.LoginForm()
 
@@ -68,9 +63,24 @@ def login():
     name = form.name.data
     password = form.password.data
 
-    if not authenticate(name, password):
+    user = authenticate(name, password)
+
+    if not user:
         return render_template('/accounts/login.html',
                                form=form)
+    return user
+
+
+@module.route('/login', methods=('GET', 'POST'))
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard.index'))
+
+    response = check_login_form()
+    if not isinstance(response, models.User):
+        return response
+    else:
+        login_user(response, remember=True)
 
     if request.args.get('next', None):
         response = redirect(request.args.get('next'))

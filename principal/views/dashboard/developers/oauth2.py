@@ -6,34 +6,36 @@ from principal import acl
 from principal import forms
 from principal import models
 
-module = Blueprint('dashboard.developers.oauth', __name__, url_prefix='/oauth')
+module = Blueprint('dashboard.developers.oauth2', __name__, url_prefix='/oauth2')
 
 
 @module.route('/')
 @acl.allows.requires(Or(acl.is_developer, acl.is_admin))
 def index():
-    oauth_clients = models.OAuthClient.objects(
+    oauth2_clients = models.OAuth2Client.objects(
             user=current_user._get_current_object())
-    return render_template('/dashboard/developers/oauth/index.html',
-                           oauth_clients=oauth_clients)
+    return render_template('/dashboard/developers/oauth2/index.html',
+                           oauth2_clients=oauth2_clients)
 
 
 @module.route('/create', methods=['GET', 'POST'])
 def create():
-    form = forms.oauth.OAuthProjectForm()
+    form = forms.oauth2.OAuth2ProjectForm()
     if not form.validate_on_submit():
-        return render_template('/dashboard/developers/oauth/create.html',
+        return render_template('/dashboard/developers/oauth2/create.html',
                                form=form)
     
-    client = models.OAuthClient(name=form.name.data,
+    client = models.OAuth2Client(name=form.name.data,
                                 description=form.description.data,
-                                confidential=form.confidential.data,
+                                is_confidential=form.is_confidential.data,
+                                default_redirect_uri=form.redirect_uris.data[0],
                                 redirect_uris=form.redirect_uris.data,
+                                allowed_scopes=['email'],
                                 user=current_user._get_current_object())
     client.save()
 
 
-    return redirect(url_for('dashboard.developers.oauth.view',
+    return redirect(url_for('dashboard.developers.oauth2.view',
                             client_id=client.id))
 
 
@@ -47,16 +49,16 @@ def delete(client_id):
     client = models.OAuthClient.objects(id=client_id,
             user=current_user._get_current_object())
     client.delete()
-    return redirect(url_for('dashboard.developers.oauth.index'))
+    return redirect(url_for('dashboard.developers.oauth2.index'))
 
 
 @module.route('/<client_id>')
 def view(client_id):
-    oauth_client = models.OAuthClient.objects(
+    oauth2_client = models.OAuth2Client.objects(
             id=client_id,
             user=current_user._get_current_object()).first()
-    if not oauth_client:
-        return redirect(url_for('dashboard.developers.oath.index'))
+    if not oauth2_client:
+        return redirect(url_for('dashboard.developers.oauth2.index'))
         
-    return render_template('/dashboard/developers/oauth/view.html',
-                           oauth_client=oauth_client)
+    return render_template('/dashboard/developers/oauth2/view.html',
+                           oauth2_client=oauth2_client)

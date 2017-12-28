@@ -24,13 +24,13 @@ class URIListField(fields.Field):
 
 
 
-class OAuthProjectForm(FlaskForm):
+class OAuth2ProjectForm(FlaskForm):
     name = fields.TextField('Name',
             validators=[validators.InputRequired(),
                         validators.Length(min=3)])
     description = fields.TextField('Description',
             validators=[validators.InputRequired()])
-    confidential = fields.BooleanField(default=False)
+    is_confidential = fields.BooleanField(default=False)
 
     redirect_uris = URIListField('Redirect URIs',
             validators=[# validators.URL(),

@@ -8,7 +8,7 @@ from flask import Flask
 from . import views
 from . import acl
 from . import models
-from . import oauth
+from . import oauth2
 from . import renderers
 
 def create_app():
@@ -18,11 +18,11 @@ def create_app():
 
     models.init_db(app)
     acl.init_acl(app)
-    oauth.init_oauth(app)
+    oauth2.init_oauth(app)
     
     views.register_blueprint(app)
     renderers.init_json(app)
-
+    
     return app
 
 

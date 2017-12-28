@@ -1,25 +1,27 @@
 from flask import Blueprint, request, jsonify
 
 from principal.renderers import render_json
-from principal.oauth import oauth2
+from principal.oauth2 import require_oauth2
 from principal import models
+
+from authlib.flask.oauth2 import current_token
 
 
 module = Blueprint('api', __name__, url_prefix='/api')
 
 
 @module.route('/email')
-@oauth2.require_oauth('email')
+@require_oauth2('email')
 def email():
-    user = request.oauth.user
+    user = current_token.user
     return render_json(dict(email=user.email,
                             username=user.username))
 
 
 @module.route('/me')
-@oauth2.require_oauth('me')
+@require_oauth2('email')
 def me():
-    user = request.oauth.user
+    user = current_token.user
     return render_json(dict(id=user.id,
                             first_name=user.first_name,
                             last_name=user.last_name,
@@ -30,7 +32,7 @@ def me():
 
 
 @module.route('/user/<username>')
-@oauth2.require_oauth('email')
+@require_oauth2('email')
 def user(username):
     user = models.User.objects(username=username).first()
     return jsonify(email=user.email, username=user.username)

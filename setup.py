@@ -13,11 +13,12 @@ requires = [
     'flask-mongoengine',
     'flask-login',
     'flask-allows',
-    'flask-oauthlib',
+    'authlib',
     'authomatic',
     'ldap3',
     'passlib',
     'bcrypt',
+    'authlib',
    ]
 
 init = os.path.join(os.path.dirname(__file__), 'principal', '__init__.py')

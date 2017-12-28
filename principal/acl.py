@@ -19,8 +19,6 @@ def is_staff(ident, request):
     return 'staff' in ident.roles
 
 
-
-
 def init_acl(app):
     # initial login manager
     login_manager = LoginManager(app)

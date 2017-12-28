@@ -2,11 +2,11 @@ from flask import Blueprint
 
 from principal import acl
 
-from . import oauth
+from . import oauth2
 
 module = Blueprint('dashboard.developers', __name__, url_prefix='/developers')
 
-subviews = [oauth]
+subviews = [oauth2]
 
 
 @module.route('/')

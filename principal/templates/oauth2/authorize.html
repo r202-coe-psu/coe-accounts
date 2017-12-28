@@ -3,7 +3,7 @@
 {% block title %}{{ config.get('APP_TITLE') }} Authorization{% endblock %}
 
 {% block content %}
-  <p>Client: {{ client.client_id }}</p>
+  <p>Client: {{ grant.client.id }}</p>
   <p>User: {{ current_user.username }}</p>
   <form action="{{ request.uri }}" method="post">
     <p>Allow access?</p>
