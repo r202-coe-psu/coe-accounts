@@ -42,7 +42,16 @@
         {{ form.redirect_uris.label }}
       </div>
     </div>
+    <div class="row">
+      <div class="input-field col s8">
+        {{ form.allowed_scopes }}
+        {{ form.allowed_scopes.label }}
+      </div>
+      <div class="input-field col s4">
+        support: email, profile
+      </div>
 
+    </div>
 
     <div class="row">
       <div class="input-field col s12">

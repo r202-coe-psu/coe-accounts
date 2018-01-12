@@ -30,7 +30,7 @@ def create():
                                 is_confidential=form.is_confidential.data,
                                 default_redirect_uri=form.redirect_uris.data[0],
                                 redirect_uris=form.redirect_uris.data,
-                                allowed_scopes=['email'],
+                                allowed_scopes=form.allowed_scopes.data,
                                 user=current_user._get_current_object())
     client.save()
 

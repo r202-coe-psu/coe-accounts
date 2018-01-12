@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+
+import sys
+import getpass
+import mongoengine as me
+
+from principal import models
+
+
+def add_admin():
+   password = getpass.getpass('Enter admin password: ')
+   
+   
+   user = models.User(
+       username='admin',
+       first_name='Admin',
+       last_name='CoE',
+       status='active',
+       roles=['admin'])
+   user.set_password(password)
+   user.save()
+
+if __name__ == '__main__':
+    dbname = 'principaldb'
+    if len(sys.argv) > 1:
+        dbname = sys.argv[1]
+
+    me.connect(dbname)
+    add_admin()

@@ -6,7 +6,7 @@ from wtforms.fields import html5
 
 from flask_wtf import FlaskForm
 
-class URIListField(fields.Field):
+class ListField(fields.Field):
     widget = widgets.TextInput()
 
     def _value(self):
@@ -22,7 +22,8 @@ class URIListField(fields.Field):
         self.data = data
         
 
-
+class URIListField(ListField):
+    pass
 
 class OAuth2ProjectForm(FlaskForm):
     name = fields.TextField('Name',
@@ -35,4 +36,7 @@ class OAuth2ProjectForm(FlaskForm):
     redirect_uris = URIListField('Redirect URIs',
             validators=[# validators.URL(),
                         validators.InputRequired()])
+    allowed_scopes = ListField('Allow Scopes',
+            default=['email'],
+            validators=[validators.InputRequired()])
 

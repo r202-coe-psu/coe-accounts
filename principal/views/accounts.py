@@ -17,7 +17,8 @@ def add_new_user_with_ldap(data):
             first_name='first_name',
             last_name='last_name',
             email='email',
-            uid='username'
+            uid='username',
+            status='active'
             )
 
     user = models.User()
@@ -65,7 +66,7 @@ def check_login_form():
 
     user = authenticate(name, password)
 
-    if not user:
+    if not user or user.status != 'active':
         return render_template('/accounts/login.html',
                                form=form)
     return user
@@ -77,6 +78,7 @@ def login():
         return redirect(url_for('dashboard.index'))
 
     response = check_login_form()
+
     if not isinstance(response, models.User):
         return response
     else:

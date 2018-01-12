@@ -1,5 +1,5 @@
-from flask import redirect, url_for, request, session
-from flask_login import LoginManager, UserMixin, current_user, login_url
+from flask import redirect, url_for, request
+from flask_login import LoginManager, current_user, login_url
 from flask_allows import Allows
 
 from . import models
@@ -32,7 +32,7 @@ def init_acl(app):
     def unauthorized_callback():
         if request.method == 'GET':
             response = redirect(login_url('accounts.login',
-                                           request.url))
+                                          request.url))
             return response
 
         return redirect(url_for('accounts.login'))

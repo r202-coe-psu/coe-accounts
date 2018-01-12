@@ -15,12 +15,13 @@ module = Blueprint('api', __name__, url_prefix='/api')
 def email():
     user = current_token.user
     return render_json(dict(email=user.email,
+                            id=user.id,
                             username=user.username))
 
 
-@module.route('/me')
-@require_oauth2('email')
-def me():
+@module.route('/profile')
+@require_oauth2('profile')
+def profile():
     user = current_token.user
     return render_json(dict(id=user.id,
                             first_name=user.first_name,
