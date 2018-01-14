@@ -18,13 +18,14 @@ def add_new_user_with_ldap(data):
             last_name='last_name',
             email='email',
             uid='username',
-            status='active'
             )
 
     user = models.User()
     for k, v in attributes.items():
         if k in data:
             user[v] = data[k]
+
+    user.status = 'active'
     data_source = models.DataSource(provider='ldap', data=data)
     user.data_sources.append(data_source)
 
@@ -65,7 +66,7 @@ def check_login_form():
     password = form.password.data
 
     user = authenticate(name, password)
-
+    print(user, user.status)
     if not user or user.status != 'active':
         return render_template('/accounts/login.html',
                                form=form)
