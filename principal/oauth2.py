@@ -63,11 +63,13 @@ def authorize():
 
 @module.route('/token', methods=['POST'])
 def issue_token():
+    print('issue token')
     return server.create_token_response()
 
 
 @module.route('/revoke', methods=['POST'])
 def revoke_token():
+    print('revoke token')
     return server.create_revocation_response()
 
 
@@ -79,7 +81,7 @@ class AuthorizationCodeGrant(_AuthorizationCodeGrant):
             code=code,
             client=client,
             redirect_uri=kwargs.get('redirect_uri', ''),
-            scope=kwargs.get('scope', ''),
+            scopes=[s.strip() for s in kwargs.get('scope', '').split(' ')],
             user=user,
         )
         item.save()
@@ -98,10 +100,15 @@ class AuthorizationCodeGrant(_AuthorizationCodeGrant):
         authorization_code.delete()
 
     def create_access_token(self, token, client, authorization_code):
+        import copy
+
+        access_token = copy.copy(token)
+        access_token.pop('scope')
         item = models.OAuth2Token(
             client=client,
             user=authorization_code.user,
-            **token
+            scopes=[s.strip() for s in token.get('scope', '').split(' ')],
+            **access_token
         )
 
         item.save()
