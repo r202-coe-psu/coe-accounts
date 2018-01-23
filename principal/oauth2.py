@@ -55,6 +55,7 @@ def authorize():
     confirmed = request.form['confirm']
     if confirmed:
         # granted by resource owner
+        print('in authorize confirm')
         return server.create_authorization_response(
                 current_user._get_current_object())
     # denied by resource owner
@@ -101,7 +102,7 @@ class AuthorizationCodeGrant(_AuthorizationCodeGrant):
 
     def create_access_token(self, token, client, authorization_code):
         import copy
-
+        print('begin create access token')
         access_token = copy.copy(token)
         access_token.pop('scope')
         item = models.OAuth2Token(
@@ -114,6 +115,7 @@ class AuthorizationCodeGrant(_AuthorizationCodeGrant):
         item.save()
         # we can add more data into token
         token['user_id'] = authorization_code.user.id
+        print('end create access token')
 
 
 # implicit_grant

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-PRINCIPAL_SETTINGS=$(pwd)/principal.cfg AUTHLIB_INSECURE_TRANSPORT=true principal-web -d
+PRINCIPAL_SETTINGS=$(pwd)/principal.cfg FLASK_DEBUG=1 AUTHLIB_INSECURE_TRANSPORT=true principal-web -d
