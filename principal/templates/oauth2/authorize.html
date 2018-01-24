@@ -3,12 +3,39 @@
 {% block title %}{{ config.get('APP_TITLE') }} Authorization{% endblock %}
 
 {% block content %}
-  <p>Client: {{ grant.client.id }}</p>
-  <p>User: {{ current_user.username }}</p>
-  <form action="{{ request.uri }}" method="post">
-    <p>Allow access?</p>
-    <input type="submit" name="confirm" value="yes">
-    <input type="submit" name="confirm" value="no">
-  </form>
+  <div class="rows">
+    <div class="col s12 m8 offset-m2 l6 offset-l3">
+      <div class="card-panel grey lighten-5 z-depth-1">
+        <div class="row valign-wrapper">
+          <div class="col s2">
+            <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">apps</i></a>
+            <img src="images/yuna.jpg" alt="" class="circle responsive-img"> <!-- notice the "circle" class -->
+          </div>
+          <div class="col s10">
+            <h4>{{ grant.client.name }}</h4>
+            <span class="black-text">
+              {{ grant.client.description }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col s4">
+            <p>
+            {{ grant.client.name }} want to access <strong>{{ grant.scopes | join(', ') }}</strong>.
+            </p>
+          </div>
+          <div class="col s8">
+            <form action="{{ request.uri }}" method="post">
+              <p>Allow access?</p>
+              <input type="submit" name="confirm" value="yes">
+              <input type="submit" name="confirm" value="no">
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 {% endblock content %}
