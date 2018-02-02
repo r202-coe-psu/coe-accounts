@@ -7,11 +7,14 @@
     <div class="col s12 m8 offset-m2 l6 offset-l3">
       <div class="card-panel grey lighten-5 z-depth-1">
         <div class="row valign-wrapper">
+          <div class="col s6">
+            <h4>{{ user.first_name }} {{ user.last_name }}</h4>
+          </div>
           <div class="col s2">
             <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">apps</i></a>
-            <img src="images/yuna.jpg" alt="" class="circle responsive-img"> <!-- notice the "circle" class -->
+            <!-- <img src="images/yuna.jpg" alt="" class="circle responsive-img"> [> notice the "circle" class <]-->
           </div>
-          <div class="col s10">
+          <div class="col s4">
             <h4>{{ grant.client.name }}</h4>
             <span class="black-text">
               {{ grant.client.description }}
