@@ -19,18 +19,21 @@ from . import models
 
 module = Blueprint('oauth2', __name__, url_prefix='/oauth2')
 
-server = AuthorizationServer(models.OAuth2Client)
-
 
 def query_token(access_token):
     return models.OAuth2Token.objects.get(access_token=access_token)
 
 
+def query_client(client_id):
+    return models.OAuth2Client.objects(id=client_id).first()
+
+
+server = AuthorizationServer()
 require_oauth2 = ResourceProtector(query_token)
 
 
 def init_oauth(app):
-    server.init_app(app)
+    server.init_app(app, query_client)
 
     server.register_grant_endpoint(AuthorizationCodeGrant)
     server.register_grant_endpoint(ImplicitGrant)
@@ -52,14 +55,14 @@ def authorize():
             grant=grant,
             user=current_user,
         )
+
     confirmed = request.form['confirm']
+    user = None
+
     if confirmed:
-        # granted by resource owner
-        print('in authorize confirm')
-        return server.create_authorization_response(
-                current_user._get_current_object())
-    # denied by resource owner
-    return server.create_authorization_response(None)
+        user = current_user._get_current_object()
+
+    return server.create_authorization_response(user)
 
 
 @module.route('/token', methods=['POST'])
@@ -68,21 +71,21 @@ def issue_token():
     return server.create_token_response()
 
 
-@module.route('/revoke', methods=['POST'])
+@module.route('/token/revoke', methods=['POST'])
 def revoke_token():
     print('revoke token')
     return server.create_revocation_response()
 
 
 class AuthorizationCodeGrant(_AuthorizationCodeGrant):
-    def create_authorization_code(self, client, user, **kwargs):
+    def create_authorization_code(self, client, user, request):
         # you can use other method to generate this code
         code = generate_token(48)
         item = models.OAuth2AuthorizationCode(
             code=code,
             client=client,
-            redirect_uri=kwargs.get('redirect_uri', ''),
-            scopes=[s.strip() for s in kwargs.get('scope', '').split(' ')],
+            redirect_uri=request.redirect_uri,
+            scopes=[s.strip() for s in request.scope.split(' ')],
             user=user,
         )
         item.save()
@@ -120,7 +123,7 @@ class AuthorizationCodeGrant(_AuthorizationCodeGrant):
 
 # implicit_grant
 class ImplicitGrant(_ImplicitGrant):
-    def create_access_token(self, token, client, grant_user, **kwargs):
+    def create_access_token(self, token, client, grant_user, request):
         item = models.OAuth2Token(
             client_id=client.client_id,
             user_id=grant_user.id,
@@ -137,7 +140,7 @@ class PasswordGrant(_PasswordGrant):
         if user.check_password(password):
             return user
 
-    def create_access_token(self, token, client, user, **kwargs):
+    def create_access_token(self, token, client, user, request):
         item = models.OAtuth2Token(
             client=client,
             user=user,

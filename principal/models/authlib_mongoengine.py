@@ -37,6 +37,12 @@ class OAuth2ClientMixin(ClientMixin):
             return True
         return redirect_uri in self.redirect_uris
 
+    def has_client_secret(self):
+        return bool(self.client_secret)
+
+    def check_client_secret(self, client_secret):
+        return self.client_secret == client_secret
+
     def check_client_type(self, client_type):
         if client_type == 'confidential':
             return self.is_confidential
@@ -71,8 +77,14 @@ class OAuth2AuthorizationCodeMixin:
     def scope(self):
         return ' '.join(self.scopes)
 
+    def get_scope(self):
+        return ' '.join(self.scopes)
+
     def is_expired(self):
         return self.expires_at < datetime.datetime.utcnow()
+
+    def get_redirect_uri(self):
+        return self.redirect_uri
 
 
 class OAuth2TokenMixin:
@@ -96,3 +108,26 @@ class OAuth2TokenMixin:
     def expires_at(self):
         expires = self.created_at + datetime.timedelta(minutes=self.expires_in)
         return expires.timestamp()
+
+    def get_scope(self):
+        return ' '.join(self.scopes)
+
+    def get_expires_in(self):
+        return self.expires_in.timestamp()
+
+    def get_expires_at(self):
+        expires = self.created_at + datetime.timedelta(minutes=self.expires_in)
+        return expires.timestamp()
+
+
+def create_query_client_func(session, model_class):
+    def query_client(client_id):
+        return model_class.objects(id=client_id).first()
+
+    return query_client
+
+
+def create_query_token_func(session, model_class):
+    def query_token(access_token):
+        return model_class.objects(access_token=access_token).first()
+    return query_token
