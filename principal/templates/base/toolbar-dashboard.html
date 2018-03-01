@@ -20,7 +20,8 @@
         <li><a class="collapsible-header waves-effect waves-cyan"><i class="material-icons">supervisor_account</i>Admin <i class="material-icons right" id="more">expand_more</i></a>
           <div class="collapsible-body">
             <ul>
-              <li><a style="padding-left:32px;" href="{{ url_for('dashboard.index') }}"><i class="material-icons">dashboard</i>Dashboard</a></li>
+              <li><a style="padding-left:32px;" href="{{ url_for('dashboard.admin.index') }}"><i class="material-icons">dashboard</i>Dashboard</a></li>
+              <li><a style="padding-left:32px;" href="{{ url_for('dashboard.admin.users.index') }}"><i class="material-icons">account_circle</i>User</a></li>
             </ul>
           </div>
         </li>

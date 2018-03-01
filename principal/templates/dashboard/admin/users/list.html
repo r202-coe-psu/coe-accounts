@@ -1,0 +1,13 @@
+{% extends '/dashboard/admin/users/index.html' %}
+{% block breadcrumbs %}
+{{ super() }}
+<a href="{{ url_for('dashboard.admin.users.list') }}" class="breadcrumb">List</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col s12">
+    <h4>User Manager List</h4>
+  </div>
+</div>
+{% endblock %}

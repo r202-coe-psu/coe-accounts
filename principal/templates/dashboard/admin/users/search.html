@@ -1,0 +1,53 @@
+{% extends '/dashboard/admin/users/index.html' %}
+{% block breadcrumbs %}
+{{ super() }}
+<a href="{{ url_for('dashboard.admin.users.search') }}" class="breadcrumb">Search</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col s12">
+    <h4>LDAP User Search</h4>
+  </div>
+</div>
+<div class="row">
+  <div class="col s12">
+    <form action="" method="POST">
+      {{ form.csrf_token }}
+      {% if form.errors %}
+      <div class="row">
+        <div class="col s12 red-text">
+          {% for error in form.errors %}
+          {{ form[error].label.text }}:
+          {{ form.errors.get(error) | join(', ') }}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      <div class="row">
+        <div class="input-field col s6">
+          {{ form.username }}
+          {{ form.username.label }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s6">
+          <button type="submit" class="waves-effect waves-light btn"><i class="material-icons left">search</i>Search</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col s12">
+    {% if results %}
+    <div class="row">
+      <div class="col s12">
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

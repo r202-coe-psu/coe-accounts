@@ -70,6 +70,7 @@ def check_login_form():
     if not user or user.status != 'active':
         return render_template('/accounts/login.html',
                                form=form)
+
     return user
 
 

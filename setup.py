@@ -19,10 +19,12 @@ requires = [
     'passlib',
     'bcrypt',
     'authlib',
+    'python-memcached'
    ]
 
 init = os.path.join(os.path.dirname(__file__), 'principal', '__init__.py')
-version_line = list(filter(lambda l: l.startswith('__version__'), open(init)))[0]
+version_line = list(
+        filter(lambda l: l.startswith('__version__'), open(init)))[0]
 VERSION = version_line.split('=')[-1].replace('\'', '').strip()
 
 setup(name='principal',

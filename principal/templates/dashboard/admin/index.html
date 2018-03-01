@@ -1,0 +1,14 @@
+{% extends '/base/default-dashboard.html' %}
+{% block title %}Developer Console{% endblock %}
+{% block dashboard_title %}{{ title() }}xxxx{% endblock %}
+{% block breadcrumbs %}
+<a href="{{ url_for('dashboard.admin.index') }}" class="breadcrumb">Admin</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col s12">
+    <h3>Wellcome to Admin Console</h3>
+  </div>
+</div>
+{% endblock %}
