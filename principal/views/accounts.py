@@ -3,8 +3,10 @@ from flask import (Blueprint,
                    url_for,
                    redirect,
                    session,
-                   request)
+                   request,
+                   current_app)
 from flask_login import login_user, logout_user, login_required, current_user
+import json
 
 from principal import forms
 from principal import models
@@ -46,7 +48,14 @@ def authenticate(name, password):
         if not user:
             data = ldap_client.get_info()
             user = add_new_user_with_ldap(data)
-
+        print('got -===>', user.has_roles(['admin']))
+        if user.has_roles(['admin']):
+            print('set cache')
+            user_data = dict(name=name, password=password)
+            user_cipher_text = current_app.crypto.encrypt(
+                    json.dumps(user_data))
+            key = 'user.{}'.format(user.id)
+            current_app.cache.set(key, user_cipher_text)
         return user
     elif user and user.verify_password(password):
         return user
@@ -66,7 +75,6 @@ def check_login_form():
     password = form.password.data
 
     user = authenticate(name, password)
-    print(user, user.status)
     if not user or user.status != 'active':
         return render_template('/accounts/login.html',
                                form=form)

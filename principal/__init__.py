@@ -11,6 +11,7 @@ from . import models
 from . import oauth2
 from . import renderers
 from . import caches
+from . import crypto
 
 
 def create_app():
@@ -26,6 +27,7 @@ def create_app():
 
     views.register_blueprint(app)
     renderers.init_json(app)
+    crypto.init_crypto(app)
 
     return app
 

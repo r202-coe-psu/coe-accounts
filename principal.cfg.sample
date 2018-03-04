@@ -1,2 +1,15 @@
 MONGODB_DB = 'principaldb'
 SECRET_KEY = 'principal-secretkey' # change it when deploy web
+
+LDAP_SERVER = 'localhost'
+LDAP_IDENTIFIER = 'cn=users,dc=example,dc=com'
+
+AUTHLIB_CACHE_TYPE = 'simple'
+
+OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 3600
+OAUTH2_REFRESH_TOKEN_GENERATOR = True
+OAUTH2_CODE_CACHE_TYPE = 'simple'
+
+MEMCACHED_SERVERS = ['127.0.0.1:11211']
+MEMCACHED_PREFIX = 'PRINCIPAL'
+

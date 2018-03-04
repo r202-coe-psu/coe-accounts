@@ -19,7 +19,8 @@ requires = [
     'passlib',
     'bcrypt',
     'authlib',
-    'python-memcached'
+    'python-memcached',
+    'pycrypto'
    ]
 
 init = os.path.join(os.path.dirname(__file__), 'principal', '__init__.py')
