@@ -5,7 +5,10 @@ from flask import (Blueprint,
                    session,
                    request,
                    current_app)
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import (login_user,
+                         logout_user,
+                         login_required,
+                         current_user)
 import json
 
 from principal import forms
@@ -48,14 +51,13 @@ def authenticate(name, password):
         if not user:
             data = ldap_client.get_info()
             user = add_new_user_with_ldap(data)
-        print('got -===>', user.has_roles(['admin']))
+
         if user.has_roles(['admin']):
-            print('set cache')
             user_data = dict(name=name, password=password)
             user_cipher_text = current_app.crypto.encrypt(
                     json.dumps(user_data))
             key = 'user.{}'.format(user.id)
-            current_app.cache.set(key, user_cipher_text)
+            session[key] = user_cipher_text
         return user
     elif user and user.verify_password(password):
         return user
@@ -104,6 +106,6 @@ def login():
 @module.route("/logout")
 @login_required
 def logout():
-    session.pop('user', None)
+    session.clear()
     logout_user()
     return redirect(url_for('site.index'))

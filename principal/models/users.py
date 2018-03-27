@@ -35,6 +35,9 @@ class User(me.Document, UserMixin):
     data_sources = me.EmbeddedDocumentListField(DataSource)
     meta = {'collection': 'users'}
 
+    def get_user_id(self):
+        return self.id
+
     def __get_salt(self, salt):
         token = salt.replace(' ', '.')
         return '{:.<22.22}'.format(token)

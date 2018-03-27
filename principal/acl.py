@@ -5,6 +5,7 @@ from flask_allows import Allows
 from . import models
 
 allows = Allows(identity_loader=lambda: current_user)
+roles = ['admin', 'developer', 'staff', 'student']
 
 
 def is_admin(ident, request):

@@ -3,5 +3,5 @@ from wtforms import (fields,
                      validators)
 
 
-class LDAPUserSearchForm(FlaskForm):
+class UserSearchForm(FlaskForm):
     username = fields.TextField('Username', validators=[validators.InputRequired()])

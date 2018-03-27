@@ -28,6 +28,18 @@ class LDAPClient:
         else:
             return None
 
+    def get_all(self):
+        entries = []
+        result = self.connection.search(self.identifier,
+                    '(objectclass=person)',
+                    attributes=['*'])
+        if result:
+            for entry in self.connection.entries:
+                data = self.transpiler_entry(entry)
+                entries.append(data)
+
+        return entries
+
     def transpiler_entry(self, entry):
         result = dict()
         attributes = dict(

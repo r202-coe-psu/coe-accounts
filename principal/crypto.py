@@ -6,7 +6,6 @@ from Crypto.Cipher import AES
 
 class AESCrypto:
     def __init__(self, key):
-        print('got key', key)
         m = hashlib.sha256()
         m.update(key.encode('utf-8'))
         self.key = m.digest()

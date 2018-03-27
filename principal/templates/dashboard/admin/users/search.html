@@ -7,7 +7,7 @@
 {% block content %}
 <div class="row">
   <div class="col s12">
-    <h4>LDAP User Search</h4>
+    <h4>User Search</h4>
   </div>
 </div>
 <div class="row">
@@ -39,15 +39,36 @@
   </div>
 </div>
 
+
+{% if users %}
 <div class="row">
   <div class="col s12">
-    {% if results %}
-    <div class="row">
-      <div class="col s12">
-      </div>
-    </div>
-    {% endif %}
+    <table>
+      <thead>
+        <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{user.username}}</td>
+          <td>{{user.first_name}} {{user.last_name}}</td>
+          <td>{{user.roles | join(', ')}}</td>
+          <td>
+            set <a href="{{ url_for('dashboard.admin.users.set_role', user_id=user.id, role='admin') }}">Admin</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+            
   </div>
 </div>
+{% endif %}
 
 {% endblock %}
