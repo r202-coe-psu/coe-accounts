@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint
 
 from principal.renderers import render_json
 from principal.oauth2 import require_oauth2
@@ -32,8 +32,19 @@ def profile():
                             last_update=user.updated_date))
 
 
-@module.route('/user/<username>')
+@module.route('/users/<username>')
 @require_oauth2('email')
 def user(username):
+    if 'admin' not in current_token.user.roles:
+        response = render_json({'error': 'Forbidden'})
+        response.status_code = 403
+        abort(response)
+
     user = models.User.objects(username=username).first()
-    return jsonify(email=user.email, username=user.username)
+    return render_json(dict(id=user.id,
+                            first_name=user.first_name,
+                            last_name=user.last_name,
+                            email=user.email,
+                            username=user.username,
+                            roles=user.roles,
+                            last_update=user.updated_date))
