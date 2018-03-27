@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, abort
 
 from principal.renderers import render_json
 from principal.oauth2 import require_oauth2
