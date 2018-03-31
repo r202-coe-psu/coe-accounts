@@ -41,6 +41,11 @@ def user(username):
         abort(response)
 
     user = models.User.objects(username=username).first()
+    if not user:
+        response = render_json({'error': 'Not Found'})
+        response.status_code = 404
+        abort(response)
+
     return render_json(dict(id=user.id,
                             first_name=user.first_name,
                             last_name=user.last_name,
