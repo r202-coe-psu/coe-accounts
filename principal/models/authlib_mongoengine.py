@@ -6,16 +6,32 @@ from authlib.specs.rfc6749 import ClientMixin
 
 class OAuth2ClientMixin(ClientMixin):
     secret = me.StringField(required=True)
-    is_confidential = me.BooleanField(required=True, default=False)
+    issued_at = me.DateTimeField(required=True,
+                                 default=datetime.datetime.utcnow)
+    expires_at = me.DateTimeField(required=True,
+                                  default=datetime.datetime.utcnow() + \
+                                          datetime.timedelta(days=300))
     redirect_uris = me.ListField(me.URLField(required=True))
-    default_redirect_uri = me.URLField(required=True)
-    allowed_scopes = me.ListField(me.StringField(required=True), required=True)
+    token_endpoint_auth_method = me.StringField(require=True,
+                                                default='client_secret_basic')
+    grant_types = me.ListField(me.StringField(required=True))
+    response_types = me.ListField(me.StringField(required=True))
+    scopes = me.ListField(me.StringField(required=True), required=True)
+
 
     created_date = me.DateTimeField(required=True,
                                     default=datetime.datetime.utcnow)
     updated_date = me.DateTimeField(required=True,
                                     default=datetime.datetime.utcnow,
                                     auto_now=True)
+
+    name = me.StringField(required=True)
+    description = me.StringField()
+    uri = me.StringField()
+
+
+    def __repr__(self):
+        return '<OAuth2ClientMixin: {}>'.format(self.id)
 
     @property
     def client_id(self):
@@ -30,11 +46,9 @@ class OAuth2ClientMixin(ClientMixin):
         return cls.objects.get(id=client_id)
 
     def get_default_redirect_uri(self):
-        return self.default_redirect_uri
+        return self.redirect_uris[0]
 
     def check_redirect_uri(self, redirect_uri):
-        if redirect_uri == self.default_redirect_uri:
-            return True
         return redirect_uri in self.redirect_uris
 
     def has_client_secret(self):
@@ -43,21 +57,21 @@ class OAuth2ClientMixin(ClientMixin):
     def check_client_secret(self, client_secret):
         return self.client_secret == client_secret
 
-    def check_client_type(self, client_type):
-        if client_type == 'confidential':
-            return self.is_confidential
-        if client_type == 'public':
-            return not self.is_confidential
-        raise ValueError('Invalid client_type')
+    def check_token_endpoint_auth_method(self, method):
+        return self.token_endpoint_auth_method == method
 
     def check_response_type(self, response_type):
-        return True
+        if self.response_types:
+            return response_type in self.response_types
+        return False
 
     def check_grant_type(self, grant_type):
-        return True
+        if self.grant_types:
+            return grant_type in self.grant_types
+        return False
 
     def check_requested_scopes(self, scopes):
-        allowed = set(self.allowed_scopes)
+        allowed = set(self.scopes)
         return allowed.issuperset(set(scopes))
 
 
@@ -93,7 +107,8 @@ class OAuth2TokenMixin:
     access_token = me.StringField(unique=True, required=True)
     refresh_token = me.StringField(index=True)
     scopes = me.ListField(me.StringField())
-    created_at = me.DateTimeField(
+    revoked = me.BooleanField(required=True, default=False)
+    issued_at = me.DateTimeField(
             required=True,
             default=datetime.datetime.utcnow)
     expires_in = me.IntField(
@@ -104,11 +119,6 @@ class OAuth2TokenMixin:
     def scope(self):
         return ' '.join(self.scopes)
 
-    @property
-    def expires_at(self):
-        expires = self.created_at + datetime.timedelta(minutes=self.expires_in)
-        return expires.timestamp()
-
     def get_scope(self):
         return ' '.join(self.scopes)
 
@@ -116,7 +126,7 @@ class OAuth2TokenMixin:
         return self.expires_in.timestamp()
 
     def get_expires_at(self):
-        expires = self.created_at + datetime.timedelta(minutes=self.expires_in)
+        expires = self.issued_at + datetime.timedelta(minutes=self.expires_in)
         return expires.timestamp()
 
 

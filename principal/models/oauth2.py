@@ -8,17 +8,12 @@ from . import users
 
 
 class OAuth2Client(me.Document, alm.OAuth2ClientMixin):
-    name = me.StringField(required=True)
-    description = me.StringField()
     secret = me.UUIDField(required=True,
                           uniqued=True,
                           binary=False,
                           default=uuid.uuid4)
 
     user = me.ReferenceField(users.User, dbref=True)
-    allowed_response_types = me.ListField(
-            me.StringField(required=True),
-            default=['code', 'token'])
 
     meta = {
         'collection': 'oauth2_clients'
@@ -27,9 +22,6 @@ class OAuth2Client(me.Document, alm.OAuth2ClientMixin):
     @property
     def client_secret(self):
         return str(self.secret)
-
-    def check_response_type(self, response_type):
-        return response_type in self.allowed_response_types
 
 
 class OAuth2Token(me.Document, alm.OAuth2TokenMixin):

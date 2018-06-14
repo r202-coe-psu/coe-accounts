@@ -2,16 +2,12 @@ from flask import Blueprint, request, render_template
 from flask_login import current_user, login_required
 
 from authlib.flask.oauth2 import (AuthorizationServer,
-                                  ResourceProtector)
+                                  ResourceProtector,
+                                  current_token)
 
-from authlib.specs.rfc6749.grants import (
-    AuthorizationCodeGrant as _AuthorizationCodeGrant,
-    ImplicitGrant as _ImplicitGrant,
-    ResourceOwnerPasswordCredentialsGrant as _PasswordGrant,
-    ClientCredentialsGrant as _ClientCredentialsGrant,
-    RefreshTokenGrant as _RefreshTokenGrant,
-)
+from authlib.specs.rfc6749 import grants 
 from authlib.specs.rfc7009 import RevocationEndpoint as _RevocationEndpoint
+from authlib.specs.rfc6750 import BearerTokenValidator
 
 from authlib.common.security import generate_token
 
@@ -27,20 +23,52 @@ def query_token(access_token):
 def query_client(client_id):
     return models.OAuth2Client.objects(id=client_id).first()
 
+def save_token(token, request):
+    user = request.user
+    # if request.user:
+    #     user_id = request.user.get_user_id()
+    # else:
+    #     # client_credentials grant_type
+    #     user_id = request.client.user_id
+    #     # or, depending on how you treat client_credentials
+    # user = models.User.objects.get(id=user_id)
+
+    ctoken = token.copy()
+    ctoken.pop('scope')
+    item = models.OAuth2Token(
+        client=request.client,
+        user=user,
+        scopes=[s.strip() for s in token.get('scope', '').split(' ')],
+        **ctoken
+    )
+    item.save()
+
+
+class PrincipalBearerTokenValidator(BearerTokenValidator):
+    def authenticate_token(self, token_string):
+        return models.OAuth2Token.objects(access_token=token_string).first()
+
+    def request_invalid(self, request):
+        return False
+
+    def token_revoked(self, token):
+        return token.revoked
+
+ResourceProtector.register_token_validator(PrincipalBearerTokenValidator())
+require_oauth2 = ResourceProtector()
+
 
 server = AuthorizationServer()
-require_oauth2 = ResourceProtector(query_token)
-
 
 def init_oauth(app):
-    server.init_app(app, query_client)
+    server.init_app(app, query_client=query_client, save_token=save_token)
 
-    server.register_grant_endpoint(AuthorizationCodeGrant)
-    server.register_grant_endpoint(ImplicitGrant)
-    server.register_grant_endpoint(PasswordGrant)
-    server.register_grant_endpoint(ClientCredentialsGrant)
-    server.register_grant_endpoint(RefreshTokenGrant)
-    server.register_revoke_token_endpoint(RevocationEndpoint)
+    server.register_grant(AuthorizationCodeGrant)
+    # server.register_grant(grants.ImplicitGrant)
+    # server.register_grant(PasswordGrant)
+    # server.register_grant(ClientCredentialsGrant)
+    server.register_grant(RefreshTokenGrant)
+    server.register_endpoint(RevocationEndpoint)
 
     app.register_blueprint(module)
 
@@ -49,7 +77,7 @@ def init_oauth(app):
 @login_required
 def authorize():
     if request.method == 'GET':
-        grant = server.validate_authorization_request()
+        grant = server.validate_consent_request(end_user=current_user)
         return render_template(
             '/oauth2/authorize.html',
             grant=grant,
@@ -62,7 +90,7 @@ def authorize():
     if confirmed:
         user = current_user._get_current_object()
 
-    return server.create_authorization_response(user)
+    return server.create_authorization_response(grant_user = user)
 
 
 @module.route('/token', methods=['POST'])
@@ -74,10 +102,10 @@ def issue_token():
 @module.route('/token/revoke', methods=['POST'])
 def revoke_token():
     print('revoke token')
-    return server.create_revocation_response()
+    return server.create_endpoint_response(RevocationEndpoint.ENDPOINT_NAME)
 
 
-class AuthorizationCodeGrant(_AuthorizationCodeGrant):
+class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
     def create_authorization_code(self, client, user, request):
         # you can use other method to generate this code
         code = generate_token(48)
@@ -103,79 +131,41 @@ class AuthorizationCodeGrant(_AuthorizationCodeGrant):
     def delete_authorization_code(self, authorization_code):
         authorization_code.delete()
 
-    def create_access_token(self, token, client, authorization_code):
-        import copy
-        print('begin create access token')
-        access_token = copy.copy(token)
-        access_token.pop('scope')
-        item = models.OAuth2Token(
-            client=client,
-            user=authorization_code.user,
-            scopes=[s.strip() for s in token.get('scope', '').split(' ')],
-            **access_token
-        )
+    def authenticate_user(self, authorization_code):
+        return authorization_code.user
+        # return models.User.objects.get(authorization_code.user_id)
 
-        item.save()
-        # we can add more data into token
-        token['user_id'] = authorization_code.user.id
-        print('end create access token')
+    # def create_access_token(self, token, client, authorization_code):
+    #     import copy
+    #     print('begin create access token')
+    #     access_token = copy.copy(token)
+    #     access_token.pop('scope')
+    #     item = models.OAuth2Token(
+    #         client=client,
+    #         user=authorization_code.user,
+    #         scopes=[s.strip() for s in token.get('scope', '').split(' ')],
+    #         **access_token
+    #     )
 
-
-# implicit_grant
-class ImplicitGrant(_ImplicitGrant):
-    def create_access_token(self, token, client, grant_user, request):
-        item = models.OAuth2Token(
-            client_id=client.client_id,
-            user_id=grant_user.id,
-            **token
-        )
-
-        item.save()
+    #     item.save()
+    #     # we can add more data into token
+    #     token['user_id'] = authorization_code.user.id
+    #     print('end create access token')
 
 
-# password_grant
-class PasswordGrant(_PasswordGrant):
-    def authenticate_user(self, username, password):
-        user = models.User.get(username=username)
-        if user.check_password(password):
-            return user
+class RefreshTokenGrant(grants.RefreshTokenGrant):
+    TOKEN_ENDPOINT_AUTH_METHODS = [
+        'client_secret_basic', 'client_secret_post'
+    ]
 
-    def create_access_token(self, token, client, user, request):
-        item = models.OAtuth2Token(
-            client=client,
-            user=user,
-            **token
-        )
-        item.save()
-
-
-# client_credentials_grant
-class ClientCredentialsGrant(_ClientCredentialsGrant):
-    def create_access_token(self, token, client):
-        item = models.OAuth2Token(
-            client=client,
-            user=client.user,
-            **token
-        )
-        item.save()
-
-
-class RefreshTokenGrant(_RefreshTokenGrant):
-    def authenticate_token(self, refresh_token):
+    def authenticate_refresh_token(self, refresh_token):
         item = models.OAuth2Token.objects(refresh_token=refresh_token).first()
         # define is_refresh_token_expired by yourself
         if item and not item.is_refresh_token_expired():
             return item
 
-    def create_access_token(self, token, authenticated_token):
-        item = models.OAuth2Token(
-            client=authenticated_token.client,
-            user=authenticated_token.user,
-            **token
-        )
-        # issue a new token to replace the old one
-        item.save()
-        authenticated_token.delete()
+    def authenticate_user(self, credential):
+        return credential.user
 
 
 class RevocationEndpoint(_RevocationEndpoint):
@@ -191,5 +181,11 @@ class RevocationEndpoint(_RevocationEndpoint):
             return item
         return q.filter_by(refresh_token=token).first()
 
+    def revoke_token(self, token):
+        token.revoked = True
+        token.save()
+
     def invalidate_token(self, token):
         token.delete()
+
+

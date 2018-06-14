@@ -25,18 +25,6 @@
       </div>
     </div>
     <div class="row">
-      <div class="col s8">
-        <div class="switch">
-          <label>
-            Confidential
-            {{ form.is_confidential }}
-            <span class="lever"></span>
-            Public
-          </label>
-        </div>
-      </div>
-    </div>
-    <div class="row">
       <div class="input-field col s12">
         {{ form.redirect_uris }}
         {{ form.redirect_uris.label }}
@@ -44,8 +32,8 @@
     </div>
     <div class="row">
       <div class="input-field col s8">
-        {{ form.allowed_scopes }}
-        {{ form.allowed_scopes.label }}
+        {{ form.scopes }}
+        {{ form.scopes.label }}
       </div>
       <div class="input-field col s4">
         support: email, profile

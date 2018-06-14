@@ -27,7 +27,7 @@
     <p><b>Client ID:</b> {{ oauth2_client.id }}</p>
     <p><b>Secret Key:</b> {{ oauth2_client.secret }}</p>
     <p><b>Redirect URIs:</b> {{ oauth2_client.redirect_uris | join(', ') }}</p>
-    <p><b>Default Scopes:</b> {{ oauth2_client.allowed_scopes | join(', ') }}</p>
+    <p><b>Default Scopes:</b> {{ oauth2_client.scopes | join(', ') }}</p>
     <p><b>Created Date:</b> {{ oauth2_client.created_date }}</p>
     <p><b>Last Update:</b> {{ oauth2_client.updated_date }}</p>
   </div>

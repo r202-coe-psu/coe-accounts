@@ -27,10 +27,10 @@ def create():
     
     client = models.OAuth2Client(name=form.name.data,
                                 description=form.description.data,
-                                is_confidential=form.is_confidential.data,
-                                default_redirect_uri=form.redirect_uris.data[0],
                                 redirect_uris=form.redirect_uris.data,
-                                allowed_scopes=form.allowed_scopes.data,
+                                scopes=form.scopes.data,
+                                response_types=['code'],
+                                grant_types=['authorization_code'],
                                 user=current_user._get_current_object())
     client.save()
 
@@ -46,7 +46,7 @@ def update():
 
 @module.route('/<client_id>/delete')
 def delete(client_id):
-    client = models.OAuthClient.objects(id=client_id,
+    client = models.OAuth2Client.objects(id=client_id,
             user=current_user._get_current_object())
     client.delete()
     return redirect(url_for('dashboard.developers.oauth2.index'))

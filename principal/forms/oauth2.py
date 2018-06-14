@@ -31,12 +31,11 @@ class OAuth2ProjectForm(FlaskForm):
                         validators.Length(min=3)])
     description = fields.TextField('Description',
             validators=[validators.InputRequired()])
-    is_confidential = fields.BooleanField(default=False)
 
     redirect_uris = URIListField('Redirect URIs',
             validators=[# validators.URL(),
                         validators.InputRequired()])
-    allowed_scopes = ListField('Allow Scopes',
+    scopes = ListField('Allow Scopes',
             default=['email'],
             validators=[validators.InputRequired()])
 
