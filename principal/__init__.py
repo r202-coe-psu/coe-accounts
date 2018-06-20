@@ -2,9 +2,9 @@ __version__ = '0.0.1'
 
 
 import optparse
+import logging
 
 from flask import Flask
-
 from . import views
 from . import acl
 from . import models
@@ -28,6 +28,10 @@ def create_app():
     views.register_blueprint(app)
     renderers.init_json(app)
     crypto.init_crypto(app)
+    
+    logging.basicConfig(level=logging.NOTSET,
+            format='%(asctime)s %(module)s %(name)s.%(funcName)s +%(lineno)s: %(levelname)-8s [%(process)d] %(message)s',
+        )
 
     return app
 

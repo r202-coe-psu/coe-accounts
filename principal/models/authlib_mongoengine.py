@@ -77,15 +77,12 @@ class OAuth2ClientMixin(ClientMixin):
 
 class OAuth2AuthorizationCodeMixin:
     code = me.StringField(unique=True, required=True)
-    # client = me.ReferenceField(OAuth2ClientMixin, dbref=True, required=True)
 
     redirect_uri = me.URLField()
-    # scope = me.StringField()
+    response_type = me.StringField()
     scopes = me.ListField(me.StringField())
-    # expires in 5 minutes by default
-    expires_at = me.DateTimeField(
-            required=True,
-            default=datetime.datetime.utcnow() + datetime.timedelta(minutes=5))
+    auth_time = me.DateTimeField(required=True,
+                                 default=datetime.datetime.utcnow())
 
     @property
     def scope(self):
@@ -95,10 +92,15 @@ class OAuth2AuthorizationCodeMixin:
         return ' '.join(self.scopes)
 
     def is_expired(self):
-        return self.expires_at < datetime.datetime.utcnow()
+        # expires in 5 minutes by default
+        return self.auth_time + datetime.timedelta(minutes=5)\
+                < datetime.datetime.utcnow()
 
     def get_redirect_uri(self):
         return self.redirect_uri
+
+    def get_auth_time(self):
+        return self.auth_time
 
 
 class OAuth2TokenMixin:

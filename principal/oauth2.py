@@ -21,7 +21,11 @@ def query_token(access_token):
 
 
 def query_client(client_id):
-    return models.OAuth2Client.objects(id=client_id).first()
+    # return models.OAuth2Client.objects(id=client_id).first()
+    c = models.OAuth2Client.objects(id=client_id).first()
+
+    print('ccc',c)
+    return c
 
 def save_token(token, request):
     user = request.user
@@ -61,6 +65,7 @@ require_oauth2 = ResourceProtector()
 server = AuthorizationServer()
 
 def init_oauth(app):
+    print('query_client=query_client,', query_client)
     server.init_app(app, query_client=query_client, save_token=save_token)
 
     server.register_grant(AuthorizationCodeGrant)
@@ -121,12 +126,16 @@ class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
         return code
 
     def parse_authorization_code(self, code, client):
+        print('parse hear')
         item = models.OAuth2AuthorizationCode.objects.get(
                 code=code,
                 client=client)
-
+        print('parse item', item)
         if item and not item.is_expired():
+            print('code not expired')
             return item
+
+        print('code expired')
 
     def delete_authorization_code(self, authorization_code):
         authorization_code.delete()
