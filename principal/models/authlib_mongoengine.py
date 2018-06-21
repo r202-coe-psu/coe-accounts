@@ -82,7 +82,7 @@ class OAuth2AuthorizationCodeMixin:
     response_type = me.StringField()
     scopes = me.ListField(me.StringField())
     auth_time = me.DateTimeField(required=True,
-                                 default=datetime.datetime.utcnow())
+                                 default=datetime.datetime.utcnow)
 
     @property
     def scope(self):
